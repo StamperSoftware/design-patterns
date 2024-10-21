@@ -1,2 +1,5 @@
 
 /.idea
+/db-data
+docker-compose.yml
+/sql
