@@ -17,11 +17,15 @@ func (app *application) routes() http.Handler {
 	mux.Handle("/static/*", http.StripPrefix("/static", fileServer))
 
 	mux.Get("/test-patterns", app.TestPatterns)
+
 	mux.Get("/api/factory-dog", app.CreateFactoryDog)
 	mux.Get("/api/factory-cat", app.CreateFactoryCat)
 
 	mux.Get("/api/abstract-factory-dog", app.CreateAbstractDog)
 	mux.Get("/api/abstract-factory-cat", app.CreateAbstractCat)
+
+	mux.Get("/api/builder-dog", app.CreateBuilderDog)
+	mux.Get("/api/builder-cat", app.CreateBuilderCat)
 
 	mux.Get("/", app.ShowHome)
 	mux.Get("/{page}", app.ShowPage)
