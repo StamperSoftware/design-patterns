@@ -1,7 +1,7 @@
 package main
 
 import (
-	"design-patterns/models"
+	"design-patterns/configuration"
 	"flag"
 	"fmt"
 	"github.com/joho/godotenv"
@@ -17,7 +17,7 @@ const port = ":4000"
 type application struct {
 	templateMap map[string]*template.Template
 	config      appConfig
-	Models      models.Models
+	App         *configuration.Application
 }
 
 type appConfig struct {
@@ -47,7 +47,7 @@ func main() {
 		log.Panic(err)
 	}
 
-	app.Models = *models.New(db)
+	app.App = configuration.New(db)
 	defer db.Close()
 
 	srv := &http.Server{

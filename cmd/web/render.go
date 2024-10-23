@@ -28,7 +28,7 @@ func (app *application) render(w http.ResponseWriter, t string, td *templateData
 			return
 		}
 
-		log.Println("building template form disk")
+		log.Println("building template from disk")
 
 		tmpl = newTemplate
 	}

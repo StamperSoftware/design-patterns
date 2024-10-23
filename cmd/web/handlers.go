@@ -58,8 +58,8 @@ func (app *application) CreateAbstractCat(w http.ResponseWriter, r *http.Request
 
 func (app *application) GetAllDogBreeds(w http.ResponseWriter, r *http.Request) {
 	var t toolbox.Tools
-	
-	dogBreeds, err := app.Models.DogBreed.All()
+
+	dogBreeds, err := app.App.Models.DogBreed.All()
 
 	if err != nil {
 		_ = t.WriteJSON(w, http.StatusBadRequest, err)
