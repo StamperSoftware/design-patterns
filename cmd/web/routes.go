@@ -23,6 +23,7 @@ func (app *application) routes() http.Handler {
 
 	mux.Get("/api/abstract-factory-dog", app.CreateAbstractDog)
 	mux.Get("/api/abstract-factory-cat", app.CreateAbstractCat)
+	mux.Get("/api/abstract-factory-animal/{species}/{breed}", app.CreateAbstractAnimal)
 
 	mux.Get("/api/builder-dog", app.CreateBuilderDog)
 	mux.Get("/api/builder-cat", app.CreateBuilderCat)

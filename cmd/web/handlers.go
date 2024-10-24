@@ -6,6 +6,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/tsawler/toolbox"
 	"net/http"
+	"net/url"
 )
 
 func (app *application) ShowHome(w http.ResponseWriter, r *http.Request) {
@@ -91,7 +92,7 @@ func (app *application) CreateBuilderDog(w http.ResponseWriter, r *http.Request)
 
 func (app *application) CreateBuilderCat(w http.ResponseWriter, r *http.Request) {
 	var t toolbox.Tools
-	dog, err := pets.NewPetBuilder().
+	cat, err := pets.NewPetBuilder().
 		SetSpecies("cat").
 		SetBreed("calico").
 		SetWeight(5).
@@ -106,12 +107,12 @@ func (app *application) CreateBuilderCat(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	_ = t.WriteJSON(w, http.StatusOK, dog)
+	_ = t.WriteJSON(w, http.StatusOK, cat)
 }
 
 func (app *application) GetRemoteCatBreeds(w http.ResponseWriter, r *http.Request) {
 	var t toolbox.Tools
-	catBreeds, err := app.catService.GetAllBreeds()
+	catBreeds, err := app.App.CatService.GetAllBreeds()
 
 	if err != nil {
 		_ = t.ErrorJSON(w, err, http.StatusBadRequest)
@@ -119,4 +120,21 @@ func (app *application) GetRemoteCatBreeds(w http.ResponseWriter, r *http.Reques
 	}
 
 	_ = t.WriteJSON(w, http.StatusOK, catBreeds)
+}
+
+func (app *application) CreateAbstractAnimal(w http.ResponseWriter, r *http.Request) {
+
+	var t toolbox.Tools
+	species := chi.URLParam(r, "species")
+	breed := chi.URLParam(r, "breed")
+	breed, _ = url.QueryUnescape(breed)
+
+	animal, err := pets.CreateAbstractFactoryPetWithBreed(species, breed)
+	
+	if err != nil {
+		t.ErrorJSON(w, err, http.StatusBadRequest)
+		return
+	}
+
+	_ = t.WriteJSON(w, http.StatusOK, animal)
 }

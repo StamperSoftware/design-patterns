@@ -1,6 +1,7 @@
 package pets
 
 import (
+	"design-patterns/configuration"
 	"design-patterns/models"
 	"errors"
 	"fmt"
@@ -28,6 +29,7 @@ func (fc *FactoryCat) Show() string {
 
 type FactoryPetInterface interface {
 	newPet() AnimalInterface
+	newPetWithBreed(breed string) AnimalInterface
 }
 
 type AbstractFactoryDog struct{}
@@ -46,6 +48,37 @@ func (fc *AbstractFactoryCat) newPet() AnimalInterface {
 	}
 }
 
+func (fc *AbstractFactoryDog) newPetWithBreed(b string) AnimalInterface {
+
+	app := configuration.GetInstance()
+	breed, err := app.Models.DogBreed.GetBreedByName(b)
+
+	if err != nil {
+		return nil
+	}
+
+	return &FactoryDog{
+		Pet: &models.Dog{
+			Breed: *breed,
+		},
+	}
+}
+func (fc *AbstractFactoryCat) newPetWithBreed(b string) AnimalInterface {
+
+	app := configuration.GetInstance()
+	breed, err := app.CatService.Remote.GetBreedByName(b)
+
+	if err != nil {
+		return nil
+	}
+
+	return &FactoryCat{
+		Pet: &models.Cat{
+			Breed: *breed,
+		},
+	}
+}
+
 func CreateAbstractFactoryPet(species string) (AnimalInterface, error) {
 	switch species {
 	case "dog":
@@ -58,6 +91,21 @@ func CreateAbstractFactoryPet(species string) (AnimalInterface, error) {
 		cat := factoryCat.newPet()
 		return cat, nil
 
+	default:
+		return nil, errors.New("invalid species")
+	}
+}
+
+func CreateAbstractFactoryPetWithBreed(species, breed string) (AnimalInterface, error) {
+	switch species {
+	case "dog":
+		var dogFactory AbstractFactoryDog
+		dog := dogFactory.newPetWithBreed(breed)
+		return dog, nil
+	case "cat":
+		var catFactory AbstractFactoryCat
+		cat := catFactory.newPetWithBreed(breed)
+		return cat, nil
 	default:
 		return nil, errors.New("invalid species")
 	}
