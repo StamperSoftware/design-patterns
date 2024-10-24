@@ -3,6 +3,7 @@ package main
 import (
 	"design-patterns/adapters"
 	"design-patterns/configuration"
+	"design-patterns/streamer"
 	"flag"
 	"fmt"
 	"github.com/joho/godotenv"
@@ -19,6 +20,7 @@ type application struct {
 	templateMap map[string]*template.Template
 	config      appConfig
 	App         *configuration.Application
+	videoQueue  chan streamer.VideoProcessingJob
 }
 
 type appConfig struct {
@@ -27,8 +29,16 @@ type appConfig struct {
 }
 
 func main() {
+
+	const numWorkers = 4
+	const numJobs = 4
+
+	videoQueue := make(chan streamer.VideoProcessingJob, numWorkers)
+	defer close(videoQueue)
+
 	app := application{
 		templateMap: make(map[string]*template.Template),
+		videoQueue:  videoQueue,
 	}
 
 	err := godotenv.Load()
@@ -57,6 +67,9 @@ func main() {
 	app.App = configuration.New(db, jsonAdapter)
 	defer db.Close()
 
+	wp := streamer.New(videoQueue, numWorkers)
+	wp.Run()
+	
 	srv := &http.Server{
 		Addr:              port,
 		Handler:           app.routes(),

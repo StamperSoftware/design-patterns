@@ -1,0 +1,18 @@
+{{template "base" .}}
+{{define "content"}}
+    {{$dom := index .Data "dog"}}
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h3 class="mt-4">Dog Of The Month!</h3>
+                <h2>{{$dom.Dog.DogName}}</h2>
+                <p>{{$dom.Dog.Description}}</p>
+            </div>
+            {{if ne $dom.Image ""}} 
+                <div class="col">
+                    <img src="/static/dom/{{$dom.Image}}" alt="dog of month" class="img img-thumbnail">        
+                </div>
+            {{end}}
+        </div>
+    </div>
+{{end}}

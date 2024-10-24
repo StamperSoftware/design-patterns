@@ -1,12 +1,14 @@
 ﻿package main
 
 import (
+	"design-patterns/models"
 	"design-patterns/pets"
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/tsawler/toolbox"
 	"net/http"
 	"net/url"
+	"time"
 )
 
 func (app *application) ShowHome(w http.ResponseWriter, r *http.Request) {
@@ -60,7 +62,7 @@ func (app *application) CreateAbstractCat(w http.ResponseWriter, r *http.Request
 func (app *application) GetAllDogBreeds(w http.ResponseWriter, r *http.Request) {
 	var t toolbox.Tools
 
-	dogBreeds, err := app.App.Models.DogBreed.All()
+	dogBreeds, err := app.App.Models.DogBreed.AllBreeds()
 
 	if err != nil {
 		_ = t.WriteJSON(w, http.StatusBadRequest, err)
@@ -130,11 +132,51 @@ func (app *application) CreateAbstractAnimal(w http.ResponseWriter, r *http.Requ
 	breed, _ = url.QueryUnescape(breed)
 
 	animal, err := pets.CreateAbstractFactoryPetWithBreed(species, breed)
-	
+
 	if err != nil {
 		t.ErrorJSON(w, err, http.StatusBadRequest)
 		return
 	}
 
 	_ = t.WriteJSON(w, http.StatusOK, animal)
+}
+
+func (app *application) GetDogOfMonth(w http.ResponseWriter, r *http.Request) {
+
+	var t toolbox.Tools
+	breed, err := app.App.Models.DogBreed.GetBreedByName("German Shepherd Dog")
+	fmt.Println(breed)
+	if err != nil {
+		t.ErrorJSON(w, err, http.StatusBadRequest)
+		return
+	}
+
+	dogOfMonth, err := app.App.Models.Dog.GetDogOfMonthByID(1)
+	fmt.Println(dogOfMonth)
+	if err != nil {
+		t.ErrorJSON(w, err, http.StatusBadRequest)
+		return
+	}
+
+	dateOfBirthLayout := "2006-01-02"
+	dateOfBirth, _ := time.Parse(dateOfBirthLayout, "2020-01-01")
+
+	dog := models.DogOfMonth{
+		Dog: &models.Dog{
+			ID:               1,
+			DogName:          "Sam",
+			BreedID:          breed.ID,
+			Color:            "black",
+			DateOfBirth:      dateOfBirth,
+			SpayedOrNeutered: 0,
+			Description:      "Nice Pup",
+			Weight:           20,
+			Breed:            *breed,
+		},
+		Video: dogOfMonth.Video,
+		Image: dogOfMonth.Image,
+	}
+	data := make(map[string]any)
+	data["dog"] = dog
+	app.render(w, "dog-of-the-month.page.gohtml", &templateData{Data: data})
 }

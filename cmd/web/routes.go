@@ -28,6 +28,8 @@ func (app *application) routes() http.Handler {
 	mux.Get("/api/builder-dog", app.CreateBuilderDog)
 	mux.Get("/api/builder-cat", app.CreateBuilderCat)
 
+	mux.Get("/dog-of-the-month", app.GetDogOfMonth)
+
 	mux.Get("/", app.ShowHome)
 	mux.Get("/{page}", app.ShowPage)
 	mux.Get("/api/dog-breeds", app.GetAllDogBreeds)
